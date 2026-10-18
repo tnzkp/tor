@@ -1,1 +1,17 @@
-
+ame: Build Tor
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y build-essential autoconf automake libevent-dev libssl-dev zlib1g-dev
+      - name: Build
+        run: |
+          ./autogen.sh
+          ./configure --disable-asciidoc
+          make -j2
+      - name: Check result
+        run: ./src/app/tor --version
+r
