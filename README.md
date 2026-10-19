@@ -1,27 +1,19 @@
-This project is no longer hosted here. Come find us at [our gitlab
-repository](https://gitlab.torproject.org/tpo/core/tor) instead.
-
-## About
-
-Tor protects your privacy on the internet by hiding the connection between
-your Internet address and the services you use. We believe Tor is reasonably
-secure, but please ensure you read the instructions and configure it properly.
-
-## Resources
-
-Home page:
-
-- https://www.torproject.org/
-
-Download new versions:
-
-- https://www.torproject.org/download/download.html
-
-Documentation, including links to installation and setup instructions:
-
-- https://www.torproject.org/docs/documentation.html
-
-Frequently Asked Questions:
-
-- https://www.torproject.org/docs/faq.html
-
+name: Build Tor
+on: [push, workflow_dispatch]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y git build-essential autoconf automake libevent-dev libssl-dev zlib1g-dev
+      - name: Get Tor source
+        run: git clone --depth 1 https://gitlab.torproject.org/tpo/core/tor.git
+      - name: Build
+        working-directory: tor
+        run: |
+          ./autogen.sh
+          ./configure --disable-asciidoc
+          make -j2
+      - name: Check result
+        working-directory: tor
+        run: ./src/app/tor --version
